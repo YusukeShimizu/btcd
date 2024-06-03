@@ -2248,8 +2248,14 @@ func opcodeCheckMultiSig(op *opcode, data []byte, vm *Engine) error {
 		if err != nil {
 			return err
 		}
+		log.Infof("[DEBUG] pubkey: %x", pubKey)
+		// check pubkey is xpub
+		if len(pubKey) != 78 {
+			return scriptError(ErrPubKeyType, "pubkey is not xpub")
+		}
 		pubKeys = append(pubKeys, pubKey)
 	}
+	log.Infof("[DEBUG] pubKeys count %d", len(pubKeys))
 
 	numSigs, err := vm.dstack.PopInt()
 	if err != nil {
@@ -2274,9 +2280,11 @@ func opcodeCheckMultiSig(op *opcode, data []byte, vm *Engine) error {
 		if err != nil {
 			return err
 		}
+		log.Infof("signature %x", signature)
 		sigInfo := &parsedSigInfo{signature: signature}
 		signatures = append(signatures, sigInfo)
 	}
+	log.Infof("[DEBUG] signatures count %d", len(signatures))
 
 	// A bug in the original Satoshi client implementation means one more
 	// stack value than should be used must be popped.  Unfortunately, this
@@ -2419,9 +2427,12 @@ func opcodeCheckMultiSig(op *opcode, data []byte, vm *Engine) error {
 		}
 
 		if valid {
+			log.Infof("Signature verified with signature %x, pubkey %x", signature, pubKey)
 			// PubKey verified, move on to the next signature.
 			signatureIdx++
 			numSignatures--
+		} else {
+			log.Infof("Signature verification failed with signature %x, pubkey %x", signature, pubKey)
 		}
 	}
 
