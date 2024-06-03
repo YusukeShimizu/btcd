@@ -2249,10 +2249,6 @@ func opcodeCheckMultiSig(op *opcode, data []byte, vm *Engine) error {
 			return err
 		}
 		log.Infof("[DEBUG] pubkey: %x", pubKey)
-		// check pubkey is xpub
-		if len(pubKey) != 78 {
-			return scriptError(ErrPubKeyType, "pubkey is not xpub")
-		}
 		pubKeys = append(pubKeys, pubKey)
 	}
 	log.Infof("[DEBUG] pubKeys count %d", len(pubKeys))
